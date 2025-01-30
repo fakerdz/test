@@ -33,17 +33,21 @@ local function autoAcceptFriendRequests()
     end
 end
 
--- Hàm tự động di chuyển giống người chơi
-local function moveLikePlayer()
-    local targetPosition = Vector3.new(math.random(-50, 50), Character.PrimaryPart.Position.Y, math.random(-50, 50)) -- Di chuyển ngẫu nhiên trong phạm vi
-
-    -- Tạo chuyển động với CFrame
-    local direction = (targetPosition - HumanoidRootPart.Position).unit
-    local moveSpeed = 16  -- Tốc độ di chuyển
-    HumanoidRootPart.CFrame = HumanoidRootPart.CFrame + direction * moveSpeed * 0.1  -- Di chuyển dần dần về hướng target
-
+-- Hàm di chuyển liên tục theo hình tròn
+local function moveInCircle()
+    local centerPosition = HumanoidRootPart.Position -- Vị trí trung tâm di chuyển (giữ nguyên)
+    local radius = 10 -- Bán kính của vòng tròn
+    local speed = 2 -- Tốc độ di chuyển
+    local angle = tick() * speed  -- Đặt góc di chuyển dựa trên thời gian (sử dụng tick() để thay đổi liên tục)
+    
+    -- Tính toán vị trí mục tiêu theo tọa độ hình tròn
+    local targetPosition = centerPosition + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+    
+    -- Di chuyển về phía mục tiêu
+    HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+    
     -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
-    wait(math.random(3, 6))
+    wait(0.1)
 end
 
 -- Hàm tự động gửi tin nhắn
@@ -76,8 +80,8 @@ spawn(function()
     while true do
         autoSendFriendRequest()
         autoAcceptFriendRequests()
-        moveLikePlayer() -- Di chuyển giống người chơi
-        task.wait(math.random(10, 20)) -- Lặp lại mỗi 10 đến 20 giây với thời gian ngẫu nhiên
+        moveInCircle() -- Di chuyển liên tục theo hình tròn
+        task.wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
     end
 end)
 
