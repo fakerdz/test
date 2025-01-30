@@ -37,14 +37,14 @@ end
 local function moveInCircle()
     local centerPosition = HumanoidRootPart.Position -- Vị trí trung tâm di chuyển (giữ nguyên)
     local radius = 10 -- Bán kính của vòng tròn
-    local speed = 2 -- Tốc độ di chuyển
+    local speed = 1 -- Tốc độ di chuyển
     local angle = tick() * speed  -- Đặt góc di chuyển dựa trên thời gian (sử dụng tick() để thay đổi liên tục)
     
     -- Tính toán vị trí mục tiêu theo tọa độ hình tròn
     local targetPosition = centerPosition + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
     
-    -- Di chuyển về phía mục tiêu
-    HumanoidRootPart.CFrame = CFrame.new(targetPosition)
+    -- Sử dụng MoveTo để di chuyển
+    Humanoid:MoveTo(targetPosition)
     
     -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
     wait(0.1)
