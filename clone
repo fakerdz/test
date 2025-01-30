@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 local messagesList = {
     "Hi!", "What is your name?", "How are you?", "What's up?", "Buy nick at fakervn ⊙ com", "Hello!", "Anyone here?", "Good game!",
     "Want to team up?", "Add me as a friend!", "Let's play together!", "Can you teach me this game?", "Anyone want to chat?", "I just started, any tips?",
@@ -36,9 +37,11 @@ end
 local function moveLikePlayer()
     local targetPosition = Vector3.new(math.random(-50, 50), Character.PrimaryPart.Position.Y, math.random(-50, 50)) -- Di chuyển ngẫu nhiên trong phạm vi
 
-    -- Di chuyển về phía target
-    Humanoid:MoveTo(targetPosition)
-    
+    -- Tạo chuyển động với CFrame
+    local direction = (targetPosition - HumanoidRootPart.Position).unit
+    local moveSpeed = 16  -- Tốc độ di chuyển
+    HumanoidRootPart.CFrame = HumanoidRootPart.CFrame + direction * moveSpeed * 0.1  -- Di chuyển dần dần về hướng target
+
     -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
     wait(math.random(3, 6))
 end
