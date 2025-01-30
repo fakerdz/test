@@ -15,44 +15,52 @@ local messagesList = {
 
 -- Hàm tự động gửi yêu cầu kết bạn
 local function autoSendFriendRequest()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and not LocalPlayer:IsFriendsWith(player.UserId) then
-            LocalPlayer:RequestFriendship(player)
-            print("Đã gửi yêu cầu kết bạn tới:", player.Name)
+    while true do
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and not LocalPlayer:IsFriendsWith(player.UserId) then
+                LocalPlayer:RequestFriendship(player)
+                print("Đã gửi yêu cầu kết bạn tới:", player.Name)
+            end
         end
+        wait(10) -- Đợi 10 giây giữa các lần gửi yêu cầu
     end
 end
 
 -- Hàm tự động chấp nhận yêu cầu kết bạn
 local function autoAcceptFriendRequests()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player:IsFriendRequestSent() then
-            LocalPlayer:AcceptFriendRequest(player)
-            print("Đã chấp nhận yêu cầu kết bạn từ:", player.Name)
+    while true do
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player:IsFriendRequestSent() then
+                LocalPlayer:AcceptFriendRequest(player)
+                print("Đã chấp nhận yêu cầu kết bạn từ:", player.Name)
+            end
         end
+        wait(10) -- Đợi 10 giây giữa các lần kiểm tra
     end
 end
 
 -- Hàm di chuyển vòng quanh một chỗ (theo hình tròn)
 local function moveInCircle()
-    local centerPosition = HumanoidRootPart.Position  -- Vị trí trung tâm di chuyển (giữ nguyên)
-    local radius = 10 -- Bán kính của vòng tròn (quy định khu vực di chuyển)
-    local speed = 2 -- Tốc độ di chuyển
-    local angle = tick() * speed  -- Đặt góc di chuyển dựa trên thời gian (sử dụng tick() để thay đổi liên tục)
-    
-    -- Tính toán vị trí mục tiêu theo tọa độ hình tròn
-    local targetPosition = centerPosition + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
-    
-    -- Di chuyển nhân vật đến vị trí mục tiêu
-    Humanoid:MoveTo(targetPosition)
-    
-    -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
-    wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
+    while true do
+        local centerPosition = HumanoidRootPart.Position  -- Vị trí trung tâm di chuyển (giữ nguyên)
+        local radius = 10 -- Bán kính của vòng tròn (quy định khu vực di chuyển)
+        local speed = 2 -- Tốc độ di chuyển
+        local angle = tick() * speed  -- Đặt góc di chuyển dựa trên thời gian (sử dụng tick() để thay đổi liên tục)
+
+        -- Tính toán vị trí mục tiêu theo tọa độ hình tròn
+        local targetPosition = centerPosition + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+
+        -- Di chuyển nhân vật đến vị trí mục tiêu
+        Humanoid:MoveTo(targetPosition)
+
+        -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
+        wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
+    end
 end
 
 -- Hàm tự động gửi tin nhắn
 local function autoChat()
-    while true do 
+    while true do
         -- Randomize the wait time between 100 and 500 seconds
         local waitTime = math.random(100, 300)
         task.wait(waitTime)
@@ -75,22 +83,23 @@ local function antiAFK()
     end
 end
 
--- Vòng lặp thực hiện hành động
+-- Khởi động tất cả các chức năng cùng lúc
 spawn(function()
-    while true do
-        autoSendFriendRequest()
-        autoAcceptFriendRequests()
-        moveInCircle() -- Di chuyển vòng quanh một khu vực
-        task.wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
-    end
+    autoSendFriendRequest()
 end)
 
--- Khởi động chức năng trò chuyện tự động
+spawn(function()
+    autoAcceptFriendRequests()
+end)
+
+spawn(function()
+    moveInCircle()
+end)
+
 spawn(function()
     autoChat()
 end)
 
--- Khởi động tính năng chống AFK
 spawn(function()
     antiAFK()
 end)
