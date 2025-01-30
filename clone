@@ -1,0 +1,89 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local messagesList = {
+    "Hi!", "What is your name?", "How are you?", "What's up?", "Buy nick at fakervn ⊙ com", "Hello!", "Anyone here?", "Good game!",
+    "Want to team up?", "Add me as a friend!", "Let's play together!", "Can you teach me this game?", "Anyone want to chat?", "I just started, any tips?",
+    "Where are you from?", "Nice to meet you!", "What's your favorite game?", "Do you like this game?", "I'm having fun!",
+    "Do you want to join my squad?", "Hey, let's explore together!", "Can you show me around?", "I'm looking for a partner!",
+    "Add me and let's grind together!", "Anyone up for some fun?", "Let's be friends!", "Do you need help?", "I'm here to play!",
+    "Can you share some tricks?", "This game is awesome!", "Who's the best player here?"
+}
+
+-- Hàm tự động gửi yêu cầu kết bạn
+local function autoSendFriendRequest()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and not LocalPlayer:IsFriendsWith(player.UserId) then
+            LocalPlayer:RequestFriendship(player)
+            print("Đã gửi yêu cầu kết bạn tới:", player.Name)
+        end
+    end
+end
+
+-- Hàm tự động chấp nhận yêu cầu kết bạn
+local function autoAcceptFriendRequests()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player:IsFriendRequestSent() then
+            LocalPlayer:AcceptFriendRequest(player)
+            print("Đã chấp nhận yêu cầu kết bạn từ:", player.Name)
+        end
+    end
+end
+
+-- Hàm tự động di chuyển giống người chơi
+local function moveLikePlayer()
+    local targetPosition = Vector3.new(math.random(-50, 50), Character.PrimaryPart.Position.Y, math.random(-50, 50)) -- Di chuyển ngẫu nhiên trong phạm vi
+
+    -- Di chuyển về phía target
+    Humanoid:MoveTo(targetPosition)
+    
+    -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
+    wait(math.random(3, 6))
+end
+
+-- Hàm tự động gửi tin nhắn
+local function autoChat()
+    while true do 
+        -- Randomize the wait time between 100 and 500 seconds
+        local waitTime = math.random(100, 300)
+        task.wait(waitTime)
+
+        -- Randomize the message to send
+        local randomIndex = math.random(1, #messagesList)
+        local randomMessage = messagesList[randomIndex]
+
+        -- Fire the chat message
+        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMessage, "All")
+    end
+end
+
+-- Hàm chống AFK
+local function antiAFK()
+    while true do
+        -- Mô phỏng hành động để tránh bị AFK
+        Humanoid:Move(Vector3.new(0, 0, 0))  -- Làm hành động di chuyển nhẹ để tránh AFK
+        task.wait(math.random(5, 10))  -- Chờ một thời gian ngẫu nhiên để tránh hành động quá đều đặn
+    end
+end
+
+-- Vòng lặp thực hiện hành động
+spawn(function()
+    while true do
+        autoSendFriendRequest()
+        autoAcceptFriendRequests()
+        moveLikePlayer() -- Di chuyển giống người chơi
+        task.wait(math.random(10, 20)) -- Lặp lại mỗi 10 đến 20 giây với thời gian ngẫu nhiên
+    end
+end)
+
+-- Khởi động chức năng trò chuyện tự động
+spawn(function()
+    autoChat()
+end)
+
+-- Khởi động tính năng chống AFK
+spawn(function()
+    antiAFK()
+end)
