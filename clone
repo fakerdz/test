@@ -39,8 +39,18 @@ local function autoAcceptFriendRequests()
     end
 end
 
--- Hàm di chuyển vòng quanh một chỗ (theo hình tròn)
-local function moveInCircle()
+-- Hàm kiểm tra trạng thái ngồi và tự động bật dậy nếu ngồi
+local function checkAndStandUp()
+    while true do
+        if Humanoid.Sit == true then  -- Nếu nhân vật đang ngồi
+            Humanoid:Sit(false)  -- Bật dậy
+        end
+        wait(1) -- Kiểm tra mỗi giây
+    end
+end
+
+-- Hàm di chuyển vòng quanh một chỗ (theo hình tròn) và nhảy
+local function moveAndJump()
     while true do
         local centerPosition = HumanoidRootPart.Position  -- Vị trí trung tâm di chuyển (giữ nguyên)
         local radius = 10 -- Bán kính của vòng tròn (quy định khu vực di chuyển)
@@ -53,7 +63,14 @@ local function moveInCircle()
         -- Di chuyển nhân vật đến vị trí mục tiêu
         Humanoid:MoveTo(targetPosition)
 
-        -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
+        -- Thỉnh thoảng nhảy (tùy thuộc vào tỷ lệ ngẫu nhiên)
+        if math.random(1, 10) > 8 then  -- 20% khả năng nhảy
+            Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+            HumanoidRootPart.Velocity = Vector3.new(0, 50, 0)  -- Nhảy lên với tốc độ nhất định
+            wait(0.5)  -- Đợi sau khi nhảy
+        end
+
+        -- Thời gian chờ ngẫu nhiên trước khi di chuyển tiếp
         wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
     end
 end
@@ -61,16 +78,15 @@ end
 -- Hàm tự động gửi tin nhắn
 local function autoChat()
     while true do
-        -- Randomize the wait time between 100 and 500 seconds
-        local waitTime = math.random(100, 300)
-        task.wait(waitTime)
-
-        -- Randomize the message to send
+        -- Chọn tin nhắn ngẫu nhiên từ danh sách
         local randomIndex = math.random(1, #messagesList)
         local randomMessage = messagesList[randomIndex]
 
-        -- Fire the chat message
+        -- Gửi tin nhắn ngay lập tức
         game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMessage, "All")
+
+        -- Đợi một thời gian ngẫu nhiên từ 10 đến 20 giây trước khi gửi tin nhắn tiếp theo
+        wait(math.random(10, 20))
     end
 end
 
@@ -93,13 +109,17 @@ spawn(function()
 end)
 
 spawn(function()
-    moveInCircle()
+    moveAndJump() -- Di chuyển vòng quanh và nhảy
 end)
 
 spawn(function()
-    autoChat()
+    autoChat() -- Gửi tin nhắn ngay lập tức
 end)
 
 spawn(function()
-    antiAFK()
+    antiAFK() -- Chống AFK
+end)
+
+spawn(function()
+    checkAndStandUp()  -- Kiểm tra và bật dậy nếu ngồi
 end)
