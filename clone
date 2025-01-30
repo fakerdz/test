@@ -44,6 +44,7 @@ local function checkAndStandUp()
     while true do
         if Humanoid.Sit == true then  -- Nếu nhân vật đang ngồi
             Humanoid:Sit(false)  -- Bật dậy
+            print("Nhân vật đã tự động đứng dậy!")
         end
         wait(1) -- Kiểm tra mỗi giây
     end
