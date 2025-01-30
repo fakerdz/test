@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
 local messagesList = {
     "Hi!", "What is your name?", "How are you?", "What's up?", "Buy nick at fakervn ⊙ com", "Hello!", "Anyone here?", "Good game!",
     "Want to team up?", "Add me as a friend!", "Let's play together!", "Can you teach me this game?", "Anyone want to chat?", "I just started, any tips?",
@@ -33,21 +33,21 @@ local function autoAcceptFriendRequests()
     end
 end
 
--- Hàm di chuyển liên tục theo hình tròn
+-- Hàm di chuyển vòng quanh một chỗ (theo hình tròn)
 local function moveInCircle()
-    local centerPosition = HumanoidRootPart.Position -- Vị trí trung tâm di chuyển (giữ nguyên)
-    local radius = 10 -- Bán kính của vòng tròn
-    local speed = 1 -- Tốc độ di chuyển
+    local centerPosition = HumanoidRootPart.Position  -- Vị trí trung tâm di chuyển (giữ nguyên)
+    local radius = 10 -- Bán kính của vòng tròn (quy định khu vực di chuyển)
+    local speed = 2 -- Tốc độ di chuyển
     local angle = tick() * speed  -- Đặt góc di chuyển dựa trên thời gian (sử dụng tick() để thay đổi liên tục)
     
     -- Tính toán vị trí mục tiêu theo tọa độ hình tròn
     local targetPosition = centerPosition + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
     
-    -- Sử dụng MoveTo để di chuyển
+    -- Di chuyển nhân vật đến vị trí mục tiêu
     Humanoid:MoveTo(targetPosition)
     
     -- Chờ một thời gian ngẫu nhiên trước khi di chuyển tiếp
-    wait(0.1)
+    wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
 end
 
 -- Hàm tự động gửi tin nhắn
@@ -62,7 +62,7 @@ local function autoChat()
         local randomMessage = messagesList[randomIndex]
 
         -- Fire the chat message
-        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMessage, "All")
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(randomMessage, "All")
     end
 end
 
@@ -80,7 +80,7 @@ spawn(function()
     while true do
         autoSendFriendRequest()
         autoAcceptFriendRequests()
-        moveInCircle() -- Di chuyển liên tục theo hình tròn
+        moveInCircle() -- Di chuyển vòng quanh một khu vực
         task.wait(0.1) -- Lặp lại mỗi 0.1 giây để di chuyển liên tục
     end
 end)
